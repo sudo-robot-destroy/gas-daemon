@@ -45,6 +45,7 @@ import subprocess
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from daemoniker import Daemon
+import configparser
 
 class MyEventHandler(FileSystemEventHandler):
     def on_modified(self, event):
@@ -56,18 +57,15 @@ def job():
     print("Running scheduled git-auto-sync...")
     subprocess.run(["git-auto-sync", "sync"], check=True)
 
-def run_daemon():
-    # Directory to monitor
-    path = "/path/to/your/directory"  # Change this to your target directory
-
+def run_daemon(directory, interval):
     # Set up file system monitoring
     event_handler = MyEventHandler()
     observer = Observer()
-    observer.schedule(event_handler, path, recursive=True)
+    observer.schedule(event_handler, directory, recursive=True)
     observer.start()
 
-    # Schedule the job to run every 10 minutes
-    schedule.every(10).minutes.do(job)
+    # Schedule the job to run every interval minutes
+    schedule.every(interval).minutes.do(job)
 
     try:
         while True:
@@ -78,11 +76,26 @@ def run_daemon():
     observer.join()
 
 if __name__ == "__main__":
-    daemon = Daemon(run_daemon)
+    # Read the config file
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+
+    directory = config['settings']['directory']
+    interval = int(config['settings']['schedule_interval'])
+
+    daemon = Daemon(lambda: run_daemon(directory, interval))
     daemon.start()
 ```
-Step 3: Modify the Script
-Make sure to replace "/path/to/your/directory" with the actual path of the directory you want to monitor.
+Step 3: Make the config file: 
+Create a configuration file named config.ini with the following content:
+
+ini
+```
+[settings]
+directory = /path/to/your/directory
+schedule_interval = 10  # in minutes
+```
+
 For Windows, use double backslashes or raw string format for paths (e.g., r"C:\\path\\to\\your\\directory").
 Step 4: Run Your Script as a Daemon
 For Ubuntu and Termux
