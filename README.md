@@ -10,24 +10,27 @@ For Ubuntu
 Open your terminal and run the following commands to install necessary packages:
 
 bash
-Copy code
+```
 sudo apt update
 sudo apt install python3-pip
 pip3 install python-daemoniker watchdog schedule
+```
 For Termux
 Open Termux and run the following commands:
 
 bash
-Copy code
+```
 pkg update
 pkg install python
 pip install python-daemoniker watchdog schedule
+```
 For Windows
 Make sure you have Python installed. You can download it from the official Python website.
 Open Command Prompt (cmd) and run:
 bash
-Copy code
+```
 pip install python-daemoniker watchdog schedule
+```
 Step 2: Create Your Python Script
 Create a Python script (e.g., git_sync_daemon.py) using a text editor (e.g., nano for Ubuntu and Termux or Notepad for Windows).
 
@@ -35,7 +38,7 @@ Example Code
 Here’s the code to include in git_sync_daemon.py:
 
 python
-Copy code
+```
 import time
 import schedule
 import subprocess
@@ -77,6 +80,7 @@ def run_daemon():
 if __name__ == "__main__":
     daemon = Daemon(run_daemon)
     daemon.start()
+```
 Step 3: Modify the Script
 Make sure to replace "/path/to/your/directory" with the actual path of the directory you want to monitor.
 For Windows, use double backslashes or raw string format for paths (e.g., r"C:\\path\\to\\your\\directory").
@@ -84,14 +88,16 @@ Step 4: Run Your Script as a Daemon
 For Ubuntu and Termux
 Run the script directly in the terminal:
 bash
-Copy code
+```
 python3 git_sync_daemon.py
+```
 Note: In Termux, simply use python instead of python3.
 
 To run it in the background, you can use:
 bash
-Copy code
+```
 nohup python3 git_sync_daemon.py &
+```
 This will keep your script running even after you close the terminal.
 
 For Windows
@@ -100,23 +106,26 @@ Open Command Prompt and navigate to the directory where your script is located.
 Run the script:
 
 cmd
-Copy code
+```
 python git_sync_daemon.py
+```
 To run it in the background, you can use a batch file. Create a .bat file (e.g., run_git_sync.bat) with the following content:
 
 batch
-Copy code
+```
 @echo off
 start /b python git_sync_daemon.py
+```
 Step 5: Monitoring Output
 For Ubuntu and Termux: The output will be displayed in the terminal or saved in nohup.out if you used nohup.
 
 For Windows: The output will be displayed in the Command Prompt. If you want to log output to a file, you can modify the .bat file:
 
 batch
-Copy code
+```
 @echo off
 start /b python git_sync_daemon.py >> output.log 2>&1
+```
 Summary
 Install the necessary packages for your environment.
 Create the Python script using Daemoniker to monitor a directory and execute git-auto-sync sync.
