@@ -46,26 +46,34 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from daemoniker import Daemon
 import configparser
+import os
 
 class MyEventHandler(FileSystemEventHandler):
+    def __init__(self, directory):
+        self.directory = directory
+        
     def on_modified(self, event):
         if not event.is_directory:  # Ignore directory changes
             print(f'{event.src_path} has been modified. Running git-auto-sync.')
-            subprocess.run(["git-auto-sync", "sync"], check=True)
+            self.run_git_auto_sync()
 
-def job():
+    def run_git_auto_sync(self):
+        # Change the working directory and run the command
+        subprocess.run(["git-auto-sync", "sync"], cwd=self.directory, check=True)
+
+def job(directory):
     print("Running scheduled git-auto-sync...")
-    subprocess.run(["git-auto-sync", "sync"], check=True)
+    subprocess.run(["git-auto-sync", "sync"], cwd=directory, check=True)
 
 def run_daemon(directory, interval):
     # Set up file system monitoring
-    event_handler = MyEventHandler()
+    event_handler = MyEventHandler(directory)
     observer = Observer()
     observer.schedule(event_handler, directory, recursive=True)
     observer.start()
 
     # Schedule the job to run every interval minutes
-    schedule.every(interval).minutes.do(job)
+    schedule.every(interval).minutes.do(lambda: job(directory))
 
     try:
         while True:
