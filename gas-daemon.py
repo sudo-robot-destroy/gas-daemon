@@ -40,7 +40,8 @@ class MyEventHandler(FileSystemEventHandler):
 
 def job(directory):
     print("Running scheduled git-auto-sync...")
-    subprocess.run(["git-auto-sync", "sync"], cwd=self.directoy, check=True)
+    subprocess.run(["git-auto-sync", "sync"], cwd=directory, check=True)
+    print("Scheduled git-auto-sync is complete")
 
 
 def run_daemon(directory, interval):
@@ -52,7 +53,7 @@ def run_daemon(directory, interval):
     observer.start()
 
     # Schedule the job to run every interval minutes
-    schedule.every(interval).minutes.do(job)
+    schedule.every(interval).minutes.do(lambda: job(directory))
 
     try:
         while True:
