@@ -12,6 +12,10 @@ class MyEventHandler(FileSystemEventHandler):
     def __init__(self, directory):
         self.directory = directory
         self.debounce_start = time.time()  # don't call sync more than once a second
+        # Go ahead and sync as soon as you start
+        print("running sync on start up")
+        subprocess.run(["git-auto-sync", "sync"], cwd=self.directory, check=True)
+        print("initial sync complete")
 
     def on_modified(self, event):
         if not event.is_directory and not self.is_hidden(event.src_path):  # Ignore directory changes and files in hidden folders
@@ -31,18 +35,12 @@ class MyEventHandler(FileSystemEventHandler):
 
     def is_hidden(self, path):
         """Says if a path contains a hidden folder"""
-        # Check for Unix-like systems
-        if os.name == 'posix':
-            return any(part.startswith('.') for part in path.split(os.sep))
-        # Check for Windows
-        elif os.name == 'nt':
-            attribute = os.stat(path).st_file_attributes
-            return attribute & 2
+        return any(part.startswith('.') for part in path.split(os.sep))
         return False
-    
+
 def job(directory):
     print("Running scheduled git-auto-sync...")
-    subprocess.run(["git-auto-sync", "sync"], cwd=directory, check=True)
+    subprocess.run(["git-auto-sync", "sync"], cwd=self.directoy, check=True)
 
 
 def run_daemon(directory, interval):
@@ -54,7 +52,7 @@ def run_daemon(directory, interval):
     observer.start()
 
     # Schedule the job to run every interval minutes
-    schedule.every(interval).minutes.do(lambda: job(directory))
+    schedule.every(interval).minutes.do(job)
 
     try:
         while True:
