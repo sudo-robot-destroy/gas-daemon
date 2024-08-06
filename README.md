@@ -5,6 +5,14 @@ Installation:
 Make sure git-auto-sync is installed and added to path. 
 Install watchdog, schedule, and daemoniker using pip. 
 
+Configuration: 
+You need a config.ini file in the same directory as gas-daemon.py that looks like this: 
+```
+[settings]
+directory = c:\Users\8to\Desktop\org-repo
+schedule_interval = 10
+```
+
 ChatGPT guidance: 
 
 Got it! Let's focus on using Daemoniker to create a cross-platform Python script that can run as a daemon in Ubuntu, Termux, and Windows without relying on systemd. Here’s a step-by-step guide that covers all three environments.
