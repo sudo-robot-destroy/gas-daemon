@@ -14,7 +14,7 @@ class MyEventHandler(FileSystemEventHandler):
         self.debounce_start = time.time()  # don't call sync more than once a second
 
     def on_modified(self, event):
-        if not event.is_directory and not self.is_hidden(event.src_path):  # Ignore directory change
+        if not event.is_directory and not self.is_hidden(event.src_path):  # Ignore directory changes and files in hidden folders
             print(f'{event.src_path} has been modified. calling callback.')
             self.run_git_auto_sync()
 
