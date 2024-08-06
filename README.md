@@ -1,6 +1,10 @@
 # gas-daemon
 A daemon for running git-auto-sync since termux doesn't use systemd
 
+Installation: 
+Make sure git-auto-sync is installed and added to path. 
+Install watchdog, schedule, and daemoniker using pip. 
+
 ChatGPT guidance: 
 
 Got it! Let's focus on using Daemoniker to create a cross-platform Python script that can run as a daemon in Ubuntu, Termux, and Windows without relying on systemd. Here’s a step-by-step guide that covers all three environments.
