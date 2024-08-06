@@ -1,11 +1,13 @@
 # gas-daemon
 A daemon for running git-auto-sync since termux doesn't use systemd
 
+You specify a directory and it runs git-auto-sync for it periodically and any time a file within the directory (or sub-directories) are modified. 
+
 ## Installation:  
 Make sure git-auto-sync is installed and added to path. 
 Install watchdog, schedule, and daemoniker using pip. 
 ```
-pip install python-daemoniker watchdog schedule
+pip install daemoniker watchdog schedule
 ```
 ## Configuration:  
 You need a config.ini file in the same directory as gas-daemon.py that looks like this: 
