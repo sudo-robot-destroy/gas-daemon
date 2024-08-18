@@ -3,7 +3,6 @@ import schedule
 import subprocess
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-from daemoniker import Daemonizer
 import configparser
 import os
 import logging
@@ -24,8 +23,7 @@ class MyEventHandler(FileSystemEventHandler):
         self.debounce_start = time.time()  # don't call sync more than once a second
         # Go ahead and sync as soon as you start
         logging.info("Running sync on start up")
-        subprocess.run(["git-auto-sync", "sync"], cwd=self.directory, check=True)
-        logging.info("initial sync complete")
+        job(self.directory)
 
     def on_modified(self, event):
         if not event.is_directory and not self.is_hidden(event.src_path):  # Ignore directory changes and files in hidden folders
@@ -36,10 +34,7 @@ class MyEventHandler(FileSystemEventHandler):
         debounce_end = time.time()
         if debounce_end - self.debounce_start > 5:
             self.debounce_start = time.time()
-            # Change the working directory and run the command
-            logging.info("Running git-auto-sync")
-            subprocess.run(["git-auto-sync", "sync"], cwd=self.directory, check=True)
-            logging.info("Completed git-auto-sync")
+            job(self.directory)
         else:
             logging.info("Not syncing again - synced within last 5 seconds")
 
@@ -49,9 +44,22 @@ class MyEventHandler(FileSystemEventHandler):
         return False
 
 def job(directory):
-    logging.info("Running scheduled git-auto-sync...")
-    subprocess.run(["git-auto-sync", "sync"], cwd=directory, check=True)
-    logging.info("Scheduled git-auto-sync is complete")
+    logging.info("Running git-auto-sync...")
+    try:
+        result = subprocess.run(
+            ["git-auto-sync", "sync"],
+            cwd=directory,
+            capture_output=True,
+            text=True,
+            check=True)
+        logging.info("git-auto-sync is complete")
+    except subprocess.CalledProcessError as e:
+        logging.error(
+            "Something is wrong, maybe there is not internet available? \n"
+            "We'll keep running and try again later\n\n"
+            f"{e} \n\n"
+            f"{e.stderr}"
+        )
 
 
 def run_daemon(directory, interval):
@@ -82,5 +90,3 @@ if __name__ == "__main__":
     directory = config['settings']['directory']
     interval = int(config['settings']['schedule_interval'])
     run_daemon(directory, interval)
-    # daemon = Daemonizer(lambda: run_daemon(directory, interval))
-    # daemon.start()
